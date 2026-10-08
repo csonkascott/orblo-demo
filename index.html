@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kindred: Fast research. Human send. (Interactive demo)</title>
+<meta name="description" content="Clickable demo of Kindred, a founder-first sales research assistant. Example data only.">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+<div class="app" id="app">
+  <header class="top">
+    <a class="brand" href="#/leads" aria-label="Kindred home">
+      <svg width="22" height="16" viewBox="0 0 22 16" aria-hidden="true"><circle cx="7.5" cy="8" r="5.6" fill="none" stroke="#B8735A" stroke-width="1.8"/><circle cx="14.5" cy="8" r="5.6" fill="none" stroke="#3A302A" stroke-width="1.8" opacity=".55"/></svg>
+      <span class="word">kindred</span>
+    </a>
+    <nav id="nav">
+      <a href="#/leads" data-nav="leads">Leads</a>
+      <a href="#/account/tidewell" data-nav="account">Accounts</a>
+      <a href="#/briefs" data-nav="briefs">Briefs</a>
+      <a href="#/company" data-nav="company">Your company</a>
+      <a href="#/voice" data-nav="voice">Voice profile</a>
+    </nav>
+    <div class="spacer"></div>
+    <span class="example" title="Every person, company, post and number in this demo is fictional.">Demo with example data</span>
+    <div class="avatar" title="Scott Csonka, rep (PT)">SC</div>
+  </header>
+  <main class="view" id="view" tabindex="-1"></main>
+  <div class="footnote">Example data only. People, companies, and posts are fictional.</div>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="modal-wrap" id="modal" aria-hidden="true"></div>
+  <script src="assets/phrases.js"></script>
+  <script src="assets/data.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>
