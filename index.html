@@ -3,36 +3,43 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Kindred: Fast research. Human send. (Interactive demo)</title>
-<meta name="description" content="Clickable demo of Kindred, a founder-first sales research assistant. Example data only.">
+<title>Kindred sample</title>
+<meta name="description" content="A clickable sample of Kindred: find companies with dated, cited reasons, research the lead, draft in your voice, send it yourself. Sample data only.">
+<meta name="color-scheme" content="light dark">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="assets/styles.css">
+<script>try{var t=new URLSearchParams(location.search).get('theme')||localStorage.getItem('kd-theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
 </head>
 <body>
-<div class="app" id="app">
-  <header class="top">
-    <a class="brand" href="#/leads" aria-label="Kindred home">
-      <svg width="22" height="16" viewBox="0 0 22 16" aria-hidden="true"><circle cx="7.5" cy="8" r="5.6" fill="none" stroke="#B8735A" stroke-width="1.8"/><circle cx="14.5" cy="8" r="5.6" fill="none" stroke="#3A302A" stroke-width="1.8" opacity=".55"/></svg>
-      <span class="word">kindred</span>
-    </a>
-    <nav id="nav">
-      <a href="#/leads" data-nav="leads">Leads</a>
-      <a href="#/account/tidewell" data-nav="account">Accounts</a>
-      <a href="#/briefs" data-nav="briefs">Briefs</a>
-      <a href="#/company" data-nav="company">Your company</a>
-      <a href="#/voice" data-nav="voice">Voice profile</a>
-    </nav>
-    <div class="spacer"></div>
-    <span class="example" title="Every person, company, post and number in this demo is fictional.">Demo with example data</span>
-    <div class="avatar" title="Scott Csonka, rep (PT)">SC</div>
-  </header>
-  <main class="view" id="view" tabindex="-1"></main>
-  <div class="footnote">Example data only. People, companies, and posts are fictional.</div>
+<a class="skip" href="#view">Skip to content</a>
+<div class="app">
+  <aside class="side">
+    <div class="side-top">
+      <a class="brand" href="#/today" aria-label="Kindred, Today">
+        <svg class="rings" width="22" height="16" viewBox="0 0 22 16" aria-hidden="true"><circle class="ring-a" cx="7.5" cy="8" r="5.6" fill="none" stroke-width="1.8"/><circle class="ring-b" cx="14.5" cy="8" r="5.6" fill="none" stroke-width="1.8" opacity="0.55"/></svg>
+        <span class="word">kindred</span>
+      </a>
+      <div id="status" class="status"></div>
+      <nav id="nav" aria-label="Main"></nav>
+    </div>
+    <div class="side-bottom">
+      <button id="theme" class="theme" type="button" data-act="theme"></button>
+      <div class="me"><span class="avatar">SC</span><span><b>Scott Csonka</b><span class="faint sm block">Sample account</span></span></div>
+    </div>
+  </aside>
+  <div class="canvas">
+    <div id="ribbon" class="ribbon" role="region" aria-label="Guided sample"></div>
+    <main id="view" class="view" tabindex="-1"></main>
+    <footer class="foot">
+      <p>Sample data. Every person, company and page here is made up, and every source uses a .example address. Nothing is sent, saved or tracked.</p>
+      <p>Kindred shows only what it can cite. Nothing goes out until you send it yourself, from your own email or by copying.</p>
+      <p>Concept, design and build: Scott Csonka, GTM Engineer.</p>
+    </footer>
+  </div>
 </div>
-<div class="toast" id="toast" role="status" aria-live="polite"></div>
-<div class="modal-wrap" id="modal" aria-hidden="true"></div>
-  <script src="assets/phrases.js"></script>
-  <script src="assets/data.js"></script>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<script src="assets/phrases.js"></script>
+<script src="assets/data.js"></script>
 <script src="assets/app.js"></script>
 </body>
 </html>
