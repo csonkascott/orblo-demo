@@ -4,9 +4,9 @@
 
 Orblo is a sales app for small business owners who have never had a sales team. It learns what you sell from your own website, finds a few businesses that need it right now, each with a dated public reason you can check, finds the right person to write to, and drafts a short note in your voice. You send it yourself. Replies land on the customer's record, and the deal moves to won.
 
-**[Try the sample in your browser](https://csonkascott.github.io/kindred-demo/)**. No sign up. It takes about three minutes.
+**[Try the sample in your browser](https://csonkascott.github.io/orblo-demo/)**. No sign up. It takes about three minutes.
 
-[![Walkthrough: onboarding on the orbital map, Discover, finding the right person, the brief, the draft and its checks, the reply, and the pipeline](media/walkthrough.gif)](https://csonkascott.github.io/kindred-demo/)
+[![Walkthrough: onboarding on the orbital map, Discover, finding the right person, the brief, the draft and its checks, the reply, and the pipeline](media/walkthrough.gif)](https://csonkascott.github.io/orblo-demo/)
 
 A guided ribbon walks you through seven steps across the four parts of Orblo. The sample seller, Crema Works, services espresso machines for cafes in Vancouver. Every name in it is made up.
 
