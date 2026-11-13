@@ -1,170 +1,256 @@
-/* Kindred demo: scripted sample data. Every person, company, page and number here is made up.
-   Sources use .example addresses. Dates are counted against SAMPLE_DAY so "8 days ago" stays true. */
-window.KD = (function () {
-  const SAMPLE_DAY = '2026-10-30';
+/* Orblo sample: scripted data. Every person, company, page and number here is made up.
+   Sources use .example addresses. Dates are counted against SAMPLE_DAY so "9 days ago" stays true. */
+window.OB = (function () {
+  'use strict';
+  const SAMPLE_DAY = '2026-11-12';
+  const REPLY_DAY = '2026-11-13';
 
-  const ME = { name: 'Scott Csonka', first: 'Scott', initials: 'SC', company: 'Shiftwell', site: 'shiftwell.example' };
+  const ME = {
+    name: 'Scott Csonka', first: 'Scott', initials: 'SC',
+    company: 'Crema Works', site: 'cremaworks.example',
+    offer: 'Espresso machine servicing and repair for cafes'
+  };
 
-  // ---- Setup: one read of your website ----
-  const SITE_PAGES = [
-    { url: 'shiftwell.example', label: 'Home page' },
-    { url: 'shiftwell.example/pricing', label: 'Pricing' },
-    { url: 'shiftwell.example/customers', label: 'Customer stories' },
-    { url: 'shiftwell.example/about', label: 'About' }
+  // ---------- Onboarding: what Orb reads, asks and finds ----------
+  const ONBOARD = {
+    readLog: ['> reading your homepage', 'read: cremaworks.example/', 'read: /services', 'read: /about', 'found: 3 services you mention', 'found: who you say you serve'],
+    sell: [
+      { label: 'A service I do for them', site: true },
+      { label: 'Something I make or supply' },
+      { label: 'Software or an app' },
+      { label: 'Lessons, coaching or classes' },
+      { label: 'Espresso machine servicing', site: true },
+      { label: 'Emergency repairs', site: true }
+    ],
+    buys: [
+      { label: 'Restaurants and cafes', site: true },
+      { label: 'Hotels, venues and events' },
+      { label: 'Shops and retail' },
+      { label: 'Bakeries', site: true },
+      { label: 'Offices' },
+      { label: 'Near Vancouver', site: true }
+    ],
+    use: ['Find new customers', 'Win back past customers', 'Plan what to say to each one', 'Keep track of who I have written to'],
+    goal: ['My first customers', 'More meetings', 'Try a new type of customer'],
+    buildLog: ['> saving who to look for', '> looking for good fits nearby', 'read: 14 public pages', 'found: 3 fits with dated reasons', '> planning each one: email and DM'],
+    // What the onboarding writes into About you. Each line says where it came from.
+    learned: [
+      { k: 'You sell', v: 'Espresso machine servicing and emergency repairs', from: 'From your site, cremaworks.example/services' },
+      { k: 'To', v: 'Independent cafes, bakeries and restaurants', from: 'From your site, then your pick' },
+      { k: 'Where', v: 'Vancouver, a short drive', from: 'Your pick' },
+      { k: 'Good timing', v: 'A new location, a new machine, or a new team behind the bar', from: 'From your site: "most of our customers call us the week a second site opens"' },
+      { k: 'Win in 90 days', v: 'My first customers', from: 'Your pick' }
+    ]
+  };
+
+  // ---------- Discover ----------
+  // Questions you write (Signals W1). Each look asks them of every company, and This week shows which ones win.
+  const QUESTIONS = [
+    { q: 'Did they open, or announce, a new location in the last 60 days?', from: 'Suggested from your site' },
+    { q: 'Are they hiring baristas or a shift lead?', from: 'Suggested from your site' },
+    { q: 'Did the city issue them a new business licence?', from: 'You added this' }
   ];
-  const LOOKING_FOR = [
-    { k: 'Who', v: 'Operations leads at businesses with two or more sites',
-      why: 'Your home page says Shiftwell is built for teams that work across locations.', src: 'shiftwell.example' },
-    { k: 'What they need', v: 'One rota for every site instead of a spreadsheet per site',
-      why: 'Every customer story starts with a spreadsheet per location.', src: 'shiftwell.example/customers' },
-    { k: 'Good timing', v: 'Just opened a new site, or hiring shift leads across sites',
-      why: 'A second site is when one rota stops working. Your customers say so too.', src: 'shiftwell.example/customers' },
-    { k: 'Where', v: 'United States and Canada',
-      why: 'Your pricing page lists USD and CAD only.', src: 'shiftwell.example/pricing' },
-    { k: 'Like your customers', v: 'Bakeries, clinics, warehouses, restaurant groups',
-      why: 'These are the businesses named on your customers page.', src: 'shiftwell.example/customers' }
-  ];
-  const ALSO_FILLED = ['ideal customer profile', 'problems it solves', 'pricing, $39 per site a month'];
-
-  // ---- Discover ----
-  const ASK = 'Operations leads at businesses that just opened a second site or are hiring shift leads across sites';
   const LOOK_STEPS = [
-    'Read who you are looking for',
-    'Checked job boards: Greenhouse, Lever, Ashby, Workable',
-    'Read company news and city business listings',
-    'Read each company site to confirm the signal',
-    'Kept companies with a dated reason from the last 60 days'
+    'Read who you are looking for and your three questions',
+    'Checked new business licences from the city, last 60 days',
+    'Checked public job boards for barista and shift lead posts',
+    'Read dated local news',
+    'Read each company site to confirm the reason',
+    'Kept companies with two kinds of dated reason. Left the rest out, each with why'
   ];
-  // Found in the order the look turns them up. "left" ones are shown as left out, with the reason.
   const FOUND = [
     {
-      id: 'northwind', name: 'Northwind Supply Co', place: 'Portland, OR', fit: 'strong',
-      summary: 'Wholesale supplier, opened a second warehouse in September.',
-      person: 'Ada Brennan', role: 'Head of Operations', personWhy: 'Named on the careers page as the hiring manager for the shift lead roles.',
-      channel: 'Email', channelWhy: 'Her work address follows the pattern on the team page. Checked, likely to deliver.',
+      id: 'harbour', name: 'Harbour Street Cafe', place: 'Mount Pleasant, Vancouver', fit: 'strong',
+      summary: 'Independent cafe, opening a second location on Main Street.',
+      answers: [true, true, true],
       signals: [
-        { text: 'Hiring three shift leads for the new Dock Road warehouse', date: '2026-10-08', src: 'northwind.example/careers', quote: 'We are hiring three shift leads for our new Dock Road site. You will help us fix scheduling across both warehouses.' },
-        { text: 'Opened a second warehouse on Dock Road', date: '2026-09-22', src: 'northwind.example/news', quote: 'Northwind opens its second warehouse, on Dock Road, to serve the east side.' }
-      ]
+        { kind: 'Their site', text: 'Second cafe opens on Main Street in late November', date: '2026-10-28', src: 'harbourstreetcafe.example/news', quote: 'Our second cafe opens on Main Street in late November. Same beans, same team spirit, twice the counter.' },
+        { kind: 'City licence', text: 'Business licence issued for 3120 Main Street', date: '2026-10-21', src: 'vancouver-opendata.example/licences/41877', quote: 'Licence issued. Harbour Street Cafe Ltd. 3120 Main St. Restaurant, class 1.' },
+        { kind: 'Job post', text: 'Hiring four baristas and a shift lead for Main Street', date: '2026-11-03', src: 'jobs.lever.example/harbourstreetcafe', quote: 'We are hiring four baristas and a shift lead for our new Main Street location. Training starts the week of the 23rd.' }
+      ],
+      whyNow: 'A second cafe means a second espresso machine to keep running, with a new team behind it. The licence came through on Oct 21, the opening is set for late November, and they are hiring the people who will use the machine.'
     },
+    { id: 'kits', name: 'Kits Coffee Bar', place: 'Kitsilano', left: 'Closed for renovation until spring. Nobody to write to yet.' },
     {
-      id: 'tidewater', name: 'Tidewater Physio Clinics', place: 'Tacoma, WA', fit: 'possible',
-      summary: 'Physical therapy group with three clinics.',
-      person: 'Ravi Mehta', role: 'Operations Lead', personWhy: 'Listed as the contact for the rota coordinator role.',
-      channel: 'LinkedIn', channelWhy: 'No work email found. He posts on LinkedIn every week.',
+      id: 'tideline', name: 'Tideline Bistro', place: 'Kitsilano, Vancouver', fit: 'strong',
+      summary: 'Bistro adding weekend brunch, with a coffee bar.',
+      answers: [false, true, false],
       signals: [
-        { text: 'Hiring a rota coordinator for three clinics', date: '2026-10-04', src: 'tidewater.example/careers', quote: 'Coordinate therapist rotas across our Tacoma, Lakewood and Puyallup clinics.' },
-        { text: 'Announced Saturday hours at every clinic', date: '2026-09-21', src: 'tidewater.example/news', quote: 'From October, all three clinics open on Saturdays.' }
-      ]
+        { kind: 'Local news', text: 'Adds weekend brunch from November', date: '2026-10-30', src: 'kitsdaily.example/food/tideline-brunch', quote: 'Tideline Bistro will open for weekend brunch from November, with a full coffee bar for the first time.' },
+        { kind: 'Job post', text: 'Hiring two baristas for weekend brunch', date: '2026-11-05', src: 'tidelinebistro.example/careers', quote: 'Two baristas for Saturday and Sunday brunch. Experience on a two group machine is a plus.' }
+      ],
+      whyNow: 'Their first coffee bar opens with brunch this month, and the job post asks for people who know a two group machine. A new bar with a new team is when machines need the most care.'
     },
-    { id: 'gull', name: 'Gull Harbor Coffee', left: 'One site only. Your profile asks for two or more.' },
+    { id: 'northside', name: 'Northside Roasters', place: 'Strathcona', left: 'They service espresso machines themselves. Their site says so.' },
     {
-      id: 'copperpot', name: 'Copper Pot Kitchens', place: 'Boise, ID', fit: 'possible',
-      summary: 'Restaurant group, second kitchen opening in November.',
-      person: 'Mo Haddad', role: 'General Manager', personWhy: 'Signs the hiring post for the new kitchen manager.',
-      channel: 'Email', channelWhy: 'Address listed on the jobs page.',
+      id: 'granville', name: 'Granville Bakehouse', place: 'Fairview, Vancouver', fit: 'possible',
+      summary: 'Bakery adding a coffee counter.',
+      answers: [false, false, true],
       signals: [
-        { text: 'Hiring a kitchen manager for a new site', date: '2026-10-12', src: 'copperpot.example/jobs', quote: 'Kitchen manager for our second location, opening in November.' }
-      ]
+        { kind: 'City licence', text: 'Licence amended to add a coffee counter', date: '2026-11-02', src: 'vancouver-opendata.example/licences/39210', quote: 'Licence amended. Granville Bakehouse. Adds food service: coffee counter.' }
+      ],
+      whyNow: 'One type of reason so far: the city licence. Orblo keeps looking for a second before it calls this strong.'
     },
-    { id: 'pinecrest', name: 'Pinecrest Storage', left: 'The newest signal is from March. Older than 60 days.' },
-    { id: 'alder', name: 'Alder & Finch Florists', left: 'Already in your Leads. Kindred does not show a company twice.' }
+    { id: 'diner', name: 'Main Street Diner', place: 'Riley Park', left: 'The only reason is a job post from March. Older than 60 days.' }
   ];
 
-  // ---- The lead the demo follows ----
-  const LEAD = {
-    id: 'ada', name: 'Ada Brennan', role: 'Head of Operations', company: 'Northwind Supply Co', domain: 'northwind.example',
-    email: 'ada.brennan@northwind.example', type: 'Outbound', from: 'Discover'
-  };
-  const SOURCES = [
-    { n: 1, title: 'Careers at Northwind', url: 'northwind.example/careers', date: '2026-10-08', excerpt: 'We are hiring three shift leads for our new Dock Road site. You will help us fix scheduling across both warehouses.' },
-    { n: 2, title: 'Northwind opens Dock Road warehouse', url: 'northwind.example/news', date: '2026-09-22', excerpt: 'Our second warehouse doubles our floor space. Both sites run two shifts, six days a week.' },
-    { n: 3, title: 'Ada Brennan, team page', url: 'northwind.example/team', date: '2026-10-27', excerpt: 'Ada runs operations across both warehouses, from receiving to the weekend crew.' }
+  // ---------- Enrichment: find the right person, then a work email ----------
+  const PEOPLE = [
+    { id: 'maria', name: 'Maria Lopez', role: 'Owner', why: 'Most senior. In a cafe this size, the owner books repairs.' },
+    { id: 'james', name: 'James Chen', role: 'General manager', why: 'Runs the floor day to day. A good second name.' },
+    { id: 'priya', name: 'Priya Shah', role: 'Shift lead', why: 'Uses the machine every day, but does not decide.' }
   ];
+  // Each step is something Orblo really runs. FullEnrich does not say which provider found what, so neither does Orblo.
+  const WATERFALL = [
+    { id: 'past', step: 'Looked up before', source: 'Orblo', note: 'Not found. This is the first lookup for Maria.', status: 'none', results: [] },
+    { id: 'people', step: 'Who works there', source: 'FullEnrich', note: '3 people, most senior first, ranked by who you sell to.', status: 'found', credits: 0.75,
+      results: [{ label: 'Owner', value: 'Maria Lopez', quality: 'usable', detail: 'Picked' }, { label: 'General manager', value: 'James Chen', quality: 'unknown', detail: 'Next best' }, { label: 'Shift lead', value: 'Priya Shah', quality: 'unknown', detail: 'Does not decide' }] },
+    { id: 'email', step: 'Work email', source: 'FullEnrich', note: 'Found. The most likely address is first.', status: 'found', credits: 1,
+      results: [{ label: 'Work email', value: 'maria@harbourstreetcafe.example', quality: 'usable', detail: 'Deliverable' }, { label: 'Work email', value: 'm.lopez@harbourstreetcafe.example', quality: 'risky', detail: 'Catch all. May not reach her' }] },
+    { id: 'phone', step: 'Company phone', source: 'Their website', note: 'From their contact page. Orblo never looks up a personal phone.', status: 'found',
+      results: [{ label: 'Company phone', value: '604 555 0143', quality: 'usable', detail: 'harbourstreetcafe.example/contact' }] }
+  ];
+  const ENRICH_SUMMARY = { credits: 1.75, left: 18 };
+
+  // ---------- Research: the pages Enrich saves, and the brief written only from them ----------
+  const SOURCES = [
+    { n: 1, title: 'News: our second cafe', url: 'harbourstreetcafe.example/news', date: '2026-10-28', excerpt: 'Our second cafe opens on Main Street in late November. Same beans, same team spirit, twice the counter.' },
+    { n: 2, title: 'Business licence, 3120 Main St', url: 'vancouver-opendata.example/licences/41877', date: '2026-10-21', excerpt: 'Licence issued. Harbour Street Cafe Ltd. Restaurant, class 1.' },
+    { n: 3, title: 'Barista and shift lead, Main Street', url: 'jobs.lever.example/harbourstreetcafe', date: '2026-11-03', excerpt: 'Hiring four baristas and a shift lead for our new Main Street location. Training starts the week of the 23rd.' },
+    { n: 4, title: 'About us', url: 'harbourstreetcafe.example/about', date: '2026-11-12', excerpt: 'Maria opened Harbour Street in 2019 with one espresso machine and a lot of patience. It is still running.' },
+    { n: 5, title: 'Main Street gets two new cafes this fall', url: 'mountpleasantnews.example/2026/10/main-street-cafes', date: '2026-10-24', excerpt: 'Harbour Street, a neighbourhood favourite on its home block, is the bigger of the two openings.' }
+  ];
+  const RESEARCH_LOG = ['Read their site: news and about', 'Read the city licence record', 'Read the job post on their board', 'Read dated local news', 'Saved 5 public pages, each with its date'];
   const BRIEF = {
     fit: { rating: 'strong', reasons: [
-      { text: 'Runs two warehouses since September, each with two shifts.', cite: 2 },
-      { text: 'Is hiring shift leads to fix scheduling across both sites, in their own words.', cite: 1 }
+      { text: 'They run a busy espresso bar, and a second one opens this month.', cite: 1 },
+      { text: 'A new team will learn the new machine from scratch.', cite: 3 }
     ] },
     whyNow: [
-      { text: 'Three shift lead roles posted 22 days ago, still open.', cite: 1 },
-      { text: 'Second warehouse opened 38 days ago.', cite: 2 }
+      { text: 'Licence for the Main Street site issued Oct 21.', cite: 2 },
+      { text: 'Opening set for late November. Training starts the week of the 23rd.', cite: 3 }
     ],
     who: [
-      { text: 'Runs operations across both sites, from receiving to the weekend crew.', cite: 3 },
-      { text: 'Owns the hiring for the new shift lead roles.', cite: 1 }
+      { text: 'Opened in 2019 by Maria Lopez, who still runs it.', cite: 4 },
+      { text: 'Proud that their first machine is still running.', cite: 4 },
+      { text: 'Local news calls them a neighbourhood favourite.', cite: 5 }
     ],
     objections: [
-      { text: 'They may already plan shifts in a spreadsheet and see no reason to change mid hiring.', kind: 'Inferred' },
-      { text: 'A new tool during a busy season can feel like one more thing to learn.', kind: 'Inferred' }
+      { text: 'Someone may already service their first machine.', kind: 'Inferred' },
+      { text: 'Opening month is busy. A short note with one small ask fits that.', kind: 'Inferred' }
     ],
-    gaps: ['Who sets the weekend rota today?', 'What they use to plan shifts now.'],
-    approach: { channel: 'Email', timing: 'This week, while the roles are open', note: 'Lead with the line from their careers page. One small offer, no meeting ask yet.' }
+    gaps: ['Who services their machine today', 'Which machine the new site will use', 'Whether Maria or James books repairs'],
+    approach: { channel: 'Email', timing: 'This week, before the opening', note: 'Open with the opening. Ask one small question about the first week.' }
   };
+
+  // ---------- Outreach ----------
   const DRAFTS = {
     email: {
       label: 'Email',
-      subject: 'Scheduling across two warehouses',
-      body: "Hi Ada,\n\nYour careers page says the new shift leads will help fix scheduling across both Northwind warehouses. That is the exact problem Shiftwell solves: one rota for every site, so a lead at Dock Road can see who is free at the first warehouse.\n\nIf it would help while you hire, I can send a sample rota built for two sites and two shifts. Want me to?\n\nScott\nShiftwell, Portland. Reply stop and I will not write again.",
-      opens: 1
+      subject: 'Main Street opening',
+      body: 'Hi Maria,\n\nI saw your second cafe opens on Main Street later this month, and that training starts the week of the 23rd.\n\nA new machine with a new team often needs a few small adjustments in its first weeks. I service espresso machines for cafes in Mount Pleasant and could look it over during that first week.\n\nWould a free check during your first week be useful?\n\nScott\nCrema Works, cremaworks.example\nIf this is not for you, reply "no thanks" and I will not write again.',
+      fact: 'second cafe opens on Main Street'
     },
     dm: {
-      label: 'LinkedIn DM',
+      label: 'DM',
       subject: '',
-      body: "Hi Ada, saw Northwind is hiring shift leads to fix scheduling across both warehouses. I build Shiftwell, one rota for every site. Happy to send a sample rota for two sites if useful. Scott",
-      opens: 1
-    },
-    call: {
-      label: 'Call opener',
-      subject: '',
-      body: "Hi Ada, it's Scott from Shiftwell. I saw on your careers page that the new shift leads are meant to fix scheduling across both warehouses. Is that still the plan, or has it moved?",
-      opens: 1
+      body: 'Hi Maria, I saw your second cafe opens on Main Street this month. I service espresso machines in Mount Pleasant. Would a free check during your first week be useful?',
+      fact: 'second cafe opens on Main Street'
     }
   };
-
-  // ---- Lived in data, so the other screens are not empty ----
-  const LEADS = [
-    { id: 'bea', name: 'Bea Lindqvist', role: 'Owner', company: 'Harbor Street Bakery', status: 'Replied', fit: 'strong', when: '2026-10-21' },
-    { id: 'ivy', name: 'Ivy Okafor', role: 'Co owner', company: 'Fernhill Yoga', status: 'Sent', fit: 'possible', when: '2026-10-24' },
-    { id: 'dev', name: 'Dev Raman', role: 'Manager', company: 'Lantern Cycles', status: 'Won', fit: 'strong', when: '2026-09-30' },
-    { id: 'lee', name: 'Lee Fontaine', role: 'Practice Manager', company: 'Oakleaf Vets', status: 'Brief ready', fit: 'possible', when: '2026-10-28' },
-    { id: 'sam', name: 'Sam Whitaker', role: 'Owner', company: 'Two Rivers Cafe', status: 'Waiting', fit: 'possible', when: '2026-10-15' }
+  const TRY_LINE = 'Can we hop on a quick call next week to discuss?';
+  const PRACTICE = [
+    { id: 'interested', label: 'Interested', reply: 'Thanks for the note. This could be useful for us. What would the next step be?' },
+    { id: 'question', label: 'A question', reply: 'Thanks. How would this work for a cafe our size? We are a small team.' },
+    { id: 'price', label: 'How much?', reply: 'Thanks for the note. Roughly how much does this cost?' },
+    { id: 'not_now', label: 'Not now', reply: 'Thanks, but now is not a good time for us. We have a lot on this month.' }
   ];
+
+  // ---------- Customers ----------
+  const REPLY = {
+    from: 'Maria Lopez', company: 'Harbour Street Cafe', day: REPLY_DAY,
+    body: 'Hi Scott, good timing. The new machine arrives on the 24th and nobody on the new team has used one like it. What would the first week check cost, and could you do the 26th?',
+    read: 'Interested',
+    note: 'She asks the price and names a day. Answer both before you ask anything of your own.',
+    next: 'Send Maria the price for a first week check, and confirm the 26th',
+    nextDue: '2026-11-14'
+  };
   const STAGES = [
     { id: 'talk', name: 'First talk', kind: 'open' },
-    { id: 'demo', name: 'Demo', kind: 'open' },
-    { id: 'proposal', name: 'Proposal', kind: 'open' },
+    { id: 'quote', name: 'Quote sent', kind: 'open' },
+    { id: 'agreed', name: 'Agreed', kind: 'open' },
     { id: 'won', name: 'Won', kind: 'won' },
     { id: 'lost', name: 'Lost', kind: 'lost' }
   ];
   const DEALS = [
-    { id: 'd-oak', name: 'Oakleaf Vets, 2 clinics', contact: 'Lee Fontaine', amount: 936, stage: 'talk', days: 3, next: 'Send the two clinic sample' },
-    { id: 'd-fern', name: 'Fernhill Yoga, 2 studios', contact: 'Ivy Okafor', amount: 936, stage: 'demo', days: 6, next: 'Demo on Tuesday' },
-    { id: 'd-harbor', name: 'Harbor Street Bakery', contact: 'Bea Lindqvist', amount: 1404, stage: 'proposal', days: 2, next: 'Follow up on the proposal Friday' },
-    { id: 'd-lantern', name: 'Lantern Cycles', contact: 'Dev Raman', amount: 936, stage: 'won', days: 11, next: '' },
-    { id: 'd-rivers', name: 'Two Rivers Cafe', contact: 'Sam Whitaker', amount: 936, stage: 'lost', days: 9, next: '', lost: 'Bad timing' }
+    { id: 'd-fern', name: 'Fernwood Pizza', contact: 'Ravi Patel, owner', amount: 1800, stage: 'quote', days: 4, next: 'Ravi said he would decide by Friday' },
+    { id: 'd-juniper', name: 'Juniper Tea House', contact: 'Emma Wilson, manager', amount: 1200, stage: 'talk', days: 2, next: 'Visit Tuesday to see the machine' },
+    { id: 'd-cedar', name: 'Cedar Lane Kitchen', contact: 'Daniel Kim, chef owner', amount: 3000, stage: 'agreed', days: 9, next: 'Sign the service plan' },
+    { id: 'd-pine', name: 'Pine Street Deli', contact: 'Laura Brown, owner', amount: 900, stage: 'lost', days: 21, lost: 'Chose a plan from the machine dealer' }
   ];
-  const NEW_DEAL = { id: 'd-north', name: 'Northwind Supply Co, 2 sites', contact: 'Ada Brennan', amount: 936, stage: 'talk', days: 0, next: 'Call Thursday at 10' };
-  const REPLY = {
-    from: 'Ada Brennan', company: 'Northwind Supply Co', when: '2026-11-01',
-    body: "Hi Scott, yes please send the sample. We start the new leads on the 16th and I'd like something better than our two spreadsheets by then. Thursday at 10 works for a quick call.",
-    read: 'Interested', note: 'Asks for the sample and offers a call time. A good moment to start a deal.'
-  };
-  const WIN_LEARN = 'Discover now ranks companies like Northwind higher: wholesale or warehouse, two sites, hiring shift leads. Your wins this month came from hiring signals, so those go first.';
+  const NEW_DEAL = { id: 'd-harbour', name: 'Harbour Street Cafe', contact: 'Maria Lopez, owner', amount: 2600, stage: 'talk', days: 0, next: 'First week check on the 26th' };
+  const WIN_LEARN = 'Orblo will look harder for cafes opening a second site. "Did they open a new location?" led to this win, so it moves up your questions.';
+
+  const TODAY_FEW = [
+    { id: 'harbour', name: 'Harbour Street Cafe', why: 'Second cafe opens on Main Street in late November', when: '2026-10-28', fit: 'strong' },
+    { id: 'tideline', name: 'Tideline Bistro', why: 'Hiring two baristas for weekend brunch', when: '2026-11-05', fit: 'strong' },
+    { id: 'granville', name: 'Granville Bakehouse', why: 'Licence amended to add a coffee counter', when: '2026-11-02', fit: 'possible' }
+  ];
+  const TASKS = [
+    { t: 'Follow up with Emma Wilson', d: 'Sent 6 days ago, no reply. Bring one new thing: the visit time that suits her.', b: 'Due today' },
+    { t: 'Send Ravi Patel the service plan', d: 'Promised on Tuesday\'s call.', b: 'Due today' },
+    { t: 'Cedar Lane Kitchen agreement', d: 'Daniel said he would sign this week.', b: 'Friday' }
+  ];
+  const LEADS = [
+    { name: 'Emma Wilson', role: 'Manager', company: 'Juniper Tea House', status: 'Sent', fit: 'strong', when: '2026-11-06' },
+    { name: 'Ravi Patel', role: 'Owner', company: 'Fernwood Pizza', status: 'Talking', fit: 'strong', when: '2026-11-02' },
+    { name: 'Daniel Kim', role: 'Chef owner', company: 'Cedar Lane Kitchen', status: 'Talking', fit: 'possible', when: '2026-10-27' }
+  ];
 
   const WEEK = {
+    lead: { k: 'Replies, this week', v: 3, change: 'Up from 1 last week' },
     tiles: [
-      { k: 'Companies shown', v: 14, d: 'From 4 looks' },
-      { k: 'Kept', v: 6, d: '8 skipped, each with a reason' },
-      { k: 'Notes you sent', v: 5, d: 'All copied or sent by you' },
-      { k: 'Replies', v: 3, d: '2 asked for more' }
+      { k: 'Notes you sent', v: '6', d: 'All sent by you, from your own email' },
+      { k: 'Deals started', v: '2', d: 'From replies' },
+      { k: 'Won', v: '$2,600', d: 'A year, one deal' }
     ],
-    worked: [
-      { text: 'Hiring signals got 2 replies from 3 notes. Openings got 1 from 2.', tone: 'good' },
-      { text: 'Notes that quoted the company’s own words got every reply this week.', tone: 'good' },
-      { text: 'Two notes waited more than 5 days. Follow ups are on Today.', tone: 'possible' }
+    questions: [
+      { q: 'Did they open a new location?', sent: 3, replies: 2 },
+      { q: 'Are they hiring baristas?', sent: 2, replies: 1 },
+      { q: 'New business licence?', sent: 1, replies: 0 }
     ]
   };
 
-  return { SAMPLE_DAY, ME, SITE_PAGES, LOOKING_FOR, ALSO_FILLED, ASK, LOOK_STEPS, FOUND, LEAD, SOURCES, BRIEF, DRAFTS, LEADS, STAGES, DEALS, NEW_DEAL, REPLY, WIN_LEARN, WEEK };
+  const GUIDES = [
+    { slug: 'research', title: 'How to research someone in 5 minutes', lede: 'You are looking for one true thing about them, not a file on them.',
+      steps: [
+        ['Minute 1: what changed', 'Read the dated reasons Orblo shows. A new location, a job post or a new licence tells you what is on their mind this month.'],
+        ['Minutes 2 and 3: their own words', 'Open their site. Read the home page and the About page. Notice how they describe their customers and what they are proud of.'],
+        ['Minute 4: who decides', 'In a small business it is usually the owner. Find the name on the About page or the listing. If you cannot find one, write to the business.'],
+        ['Minute 5: one sentence', 'Write down the one fact that makes this a good week to write to them. If you cannot find one, skip them. That is a good result too.']
+      ], keep: 'One real, dated fact beats ten things you could say to anyone.' },
+    { slug: 'first-line', title: 'Writing a first line that\'s about them', lede: 'The first line decides whether the rest gets read.',
+      steps: [
+        ['Start with what happened on their side', 'Name the thing you noticed and when. They know at once that the note was written for them.'],
+        ['Leave yourself out of it', 'Your name, your company and what you sell can wait for the second or third sentence.'],
+        ['Say why it matters to them', 'Add one line on what that change usually brings. Now they can see you understand their week.'],
+        ['Check it', 'Could you send this exact line to another business? If yes, it needs a fact that is only true of them.']
+      ], keep: 'A fact, a date, and why it matters to them. Then stop.' },
+    { slug: 'follow-up', title: 'A good second note', lede: 'Silence usually means busy, not no.',
+      steps: [
+        ['Wait five days', 'Sooner feels like pressure. Orblo reminds you when it is time, so you do not have to keep count.'],
+        ['Bring one new thing', 'A new fact about them, a short example from a customer like them, or an answer to a question they might have.'],
+        ['Keep it shorter than the first', 'Two or three sentences. One easy question at the end.'],
+        ['Stop at two', 'Orblo never suggests more than two follow ups. After that, leave them be.']
+      ], keep: 'Each note should be worth reading even if they never saw the one before it.' }
+  ];
+
+  // Ask Orb: questions with answers that cite what Orblo saved. Scripted for the sample.
+  const ORB = [
+    { q: 'Why is Harbour Street a strong fit?', a: 'Two kinds of dated reason line up with what you sell. Their own news says a second cafe opens in late November, and the city issued the licence on Oct 21. They are also hiring the team who will use the new machine.', cites: ['harbourstreetcafe.example/news', 'vancouver-opendata.example/licences/41877', 'jobs.lever.example/harbourstreetcafe'] },
+    { q: 'Who should I write to next?', a: 'Tideline Bistro. Their first coffee bar opens with weekend brunch this month, and they are hiring baristas who know a two group machine. I have not found a person there yet, so start with Find the right person.', cites: ['kitsdaily.example/food/tideline-brunch', 'tidelinebistro.example/careers'] },
+    { q: 'What is still missing on Harbour Street?', a: 'I could not find who services their first machine today, which machine the new site will use, or whether Maria or James books repairs. Those make good questions if she writes back. I will not guess them.', cites: [] }
+  ];
+
+  return { SAMPLE_DAY, REPLY_DAY, ME, ONBOARD, QUESTIONS, LOOK_STEPS, FOUND, PEOPLE, WATERFALL, ENRICH_SUMMARY, SOURCES, RESEARCH_LOG, BRIEF, DRAFTS, TRY_LINE, PRACTICE, REPLY, STAGES, DEALS, NEW_DEAL, WIN_LEARN, TODAY_FEW, TASKS, LEADS, WEEK, GUIDES, ORB };
 })();

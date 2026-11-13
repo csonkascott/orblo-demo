@@ -2,29 +2,39 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Kindred sample</title>
-<meta name="description" content="A clickable sample of Kindred: find companies with dated, cited reasons, research the lead, draft in your voice, send it yourself. Sample data only.">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Orblo sample</title>
+<meta name="description" content="A clickable sample of Orblo: onboarding that reads your site, companies found from dated public reasons, the right person and a work email, a cited brief, a note you send yourself, and the customer record it lands on. Sample data only.">
 <meta name="color-scheme" content="light dark">
+<meta property="og:title" content="Orblo sample">
+<meta property="og:description" content="Who to write to this week, and what to say. A clickable sample with made up data.">
+<meta property="og:image" content="https://csonkascott.github.io/orblo-demo/media/og.png">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/inter.css">
 <link rel="stylesheet" href="assets/styles.css">
-<script>try{var t=new URLSearchParams(location.search).get('theme')||localStorage.getItem('kd-theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+<script>try{var t=new URLSearchParams(location.search).get('theme')||localStorage.getItem('ob-theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
 </head>
 <body>
-<a class="skip" href="#view">Skip to content</a>
-<div class="app">
+<a class="skip" href="#view" data-act="skip-content">Skip to content</a>
+<div class="stage" id="stage" hidden></div>
+<div class="app" id="app">
   <aside class="side">
     <div class="side-top">
-      <a class="brand" href="#/today" aria-label="Kindred, Today">
-        <svg class="rings" width="22" height="16" viewBox="0 0 22 16" aria-hidden="true"><circle class="ring-a" cx="7.5" cy="8" r="5.6" fill="none" stroke-width="1.8"/><circle class="ring-b" cx="14.5" cy="8" r="5.6" fill="none" stroke-width="1.8" opacity="0.55"/></svg>
-        <span class="word">kindred</span>
+      <a class="brand" href="#/today" aria-label="Orblo, Today">
+        <svg class="rings" width="22" height="16" viewBox="0 0 22 16" aria-hidden="true" focusable="false"><defs><clipPath id="ring-lower"><rect x="9" y="10.4" width="4" height="4"/></clipPath></defs><circle class="ring-a" cx="7.5" cy="8" r="5.6" fill="none" stroke-width="1.8"/><circle class="ring-b" cx="14.5" cy="8" r="5.6" fill="none" stroke-width="1.8"/><circle class="ring-a" cx="7.5" cy="8" r="5.6" fill="none" stroke-width="1.8" clip-path="url(#ring-lower)"/></svg>
+        <span class="word">orbl<span class="word-o">o</span></span>
       </a>
       <div id="status" class="status"></div>
-      <nav id="nav" aria-label="Main"></nav>
+      <nav id="nav" class="nav" aria-label="Main"></nav>
+      <button type="button" class="ask-orb" data-act="orb">Ask Orb</button>
     </div>
     <div class="side-bottom">
-      <button id="theme" class="theme" type="button" data-act="theme"></button>
-      <div class="me"><span class="avatar">SC</span><span><b>Scott Csonka</b><span class="faint sm block">Sample account</span></span></div>
+      <a class="side-link" href="#/guides" id="guides-link">Guides</a>
+      <div class="theme-switch" role="group" aria-label="Colours">
+        <button type="button" data-act="theme" data-theme="light">Light</button>
+        <button type="button" data-act="theme" data-theme="dark">Dark</button>
+      </div>
+      <div class="me"><span class="avatar" aria-hidden="true">SC</span><span><b>Scott Csonka</b><span class="faint sm block">Sample account</span></span></div>
     </div>
   </aside>
   <div class="canvas">
@@ -32,14 +42,16 @@
     <main id="view" class="view" tabindex="-1"></main>
     <footer class="foot">
       <p>Sample data. Every person, company and page here is made up, and every source uses a .example address. Nothing is sent, saved or tracked.</p>
-      <p>Kindred shows only what it can cite. Nothing goes out until you send it yourself, from your own email or by copying.</p>
+      <p>Orblo shows only what it can cite. Nothing goes out until you send it yourself, from your own email or by copying.</p>
       <p>Concept, design and build: Scott Csonka, GTM Engineer.</p>
     </footer>
   </div>
 </div>
+<div id="orb" class="drawer" role="dialog" aria-modal="false" aria-labelledby="orb-title" hidden></div>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
 <script src="assets/phrases.js"></script>
 <script src="assets/data.js"></script>
+<script src="assets/orbit.js"></script>
 <script src="assets/app.js"></script>
 </body>
 </html>
